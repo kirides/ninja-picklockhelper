@@ -16,3 +16,6 @@
 # How it looks
 
 ![IngameExample](./Ingame_Gothic2.jpg)
+
+# Credits
+`F A W K E S` (WoG) - Für die reguläre Implementation 
