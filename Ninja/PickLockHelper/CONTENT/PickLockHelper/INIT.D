@@ -27,6 +27,7 @@ var int PickLockHelper_hTextView;
 var int PickLockHelper_hTextViewLast;
 var int PickLockHelper_hTextViewLastBg;
 var int PickLockHelper_hTextViewBg;
+var string PicKLockHelper_Font;
 
 func void PickLockHelper_DisplayText(var string text) {
     var zCViewText textView;
@@ -34,18 +35,18 @@ func void PickLockHelper_DisplayText(var string text) {
     
     if(!PickLockHelper_hTextView) {
         const string maxText = "________________________________________";
-        var int posX; posX = (PS_VMax - Print_ToVirtual(Print_GetStringWidth(maxText, TEXT_FONT_DEFAULT), PS_X)) / 2;
+        var int posX; posX = (PS_VMax - Print_ToVirtual(Print_GetStringWidth(maxText, PicKLockHelper_Font), PS_X)) / 2;
 
         PickLockHelper_hTextViewLastBg = View_Create(posX, 400, 1, 1);
-        View_ResizePxl(PickLockHelper_hTextViewLastBg, Print_GetStringWidth(maxText, TEXT_FONT_DEFAULT), Print_GetFontHeight(TEXT_FONT_DEFAULT));
+        View_ResizePxl(PickLockHelper_hTextViewLastBg, Print_GetStringWidth(maxText, PicKLockHelper_Font), Print_GetFontHeight(PicKLockHelper_Font));
         View_SetTexture(PickLockHelper_hTextViewLastBg, "Black.tga");
         View_SetAlpha(PickLockHelper_hTextViewLastBg, 128);
 
         PickLockHelper_hTextViewBg = View_Create(posX, 400, 1, 1);
-        View_ResizePxl(PickLockHelper_hTextViewBg, Print_GetStringWidth(maxText, TEXT_FONT_DEFAULT), Print_GetFontHeight(TEXT_FONT_DEFAULT));
+        View_ResizePxl(PickLockHelper_hTextViewBg, Print_GetStringWidth(maxText, PicKLockHelper_Font), Print_GetFontHeight(PicKLockHelper_Font));
 
         // Previous progress
-        PickLockHelper_hTextViewLast = Print_CreateText(pickLockString_Last, TEXT_FONT_DEFAULT);
+        PickLockHelper_hTextViewLast = Print_CreateText(pickLockString_Last, PicKLockHelper_Font);
         textViewLast = Print_GetText(PickLockHelper_hTextViewLast);
         textViewLast.posx = 300;
         textViewLast.color = RGBA(255, 255, 255, 128);
@@ -54,7 +55,7 @@ func void PickLockHelper_DisplayText(var string text) {
 
 
         // Current progress
-        PickLockHelper_hTextView = Print_CreateText(text, TEXT_FONT_DEFAULT);
+        PickLockHelper_hTextView = Print_CreateText(text, PicKLockHelper_Font);
         textView = Print_GetText(PickLockHelper_hTextView);
         // textView.color = RGBA(255, 32, 82, 255);
         textView.posx = 300;
@@ -72,7 +73,7 @@ func void PickLockHelper_DisplayText(var string text) {
         textView.text = text;
     };
     
-    // Print_Ext(150, 400, text, TEXT_FONT_DEFAULT, RGBA(255,32,82,255), 3000);
+    // Print_Ext(150, 400, text, PicKLockHelper_Font, RGBA(255,32,82,255), 3000);
 };
 
 func void PickLockHelper_RemoveText() {
@@ -235,8 +236,10 @@ func void PickLockHelper_Init() {
 	HookEngine(MEMINT_SwitchG1G2(oCMobInter__StopInteraction_G1 , oCMobInter__StopInteraction_G2 ), 6, "Ninja_PickLockHelper_HOOK_MOBINTER_STOPINTERACTION" );
 
 	if(MEMINT_SwitchG1G2(1, 0)) {
+        PicKLockHelper_Font = "FONT_OLD_10_WHITE.TGA";
 		HookEngine(oCMobLockable__PickLock_G1, 13, "Ninja_PickLockHelper_HOOK_MOBCONTAINER_PICKLOCK");
 	} else {
+        PicKLockHelper_Font = TEXT_FONT_DEFAULT;
 		HookEngine(oCMobLockable__PickLock_G2, 6, "Ninja_PickLockHelper_HOOK_MOBCONTAINER_PICKLOCK");
 	};
     HookDaedalusFuncS("G_PickLock", "Ninja_PickLockHelper_G_PickLock");
