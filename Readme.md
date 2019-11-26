@@ -15,4 +15,4 @@
 
 # How it looks
 
-![IngameExample](https://https://raw.githubusercontent.com/Kirides/ninja-picklockhelper/master/Ingame_Gothic2.jpg)
+![IngameExample](./Ingame_Gothic2.jpg)
