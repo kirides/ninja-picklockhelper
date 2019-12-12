@@ -1,0 +1,21 @@
+[BEGINVDF]
+Comment=Adds bonus damage agains Orcs to the OrcSlayer
+BaseDir=.\
+VDFName=.\PickLockHelper.vdf
+
+[FILES]
+; Resources (list the specific files from _work here)
+; _work\* -r
+
+; Script files
+Ninja\PickLockHelper\* -r
+
+[EXCLUDE]
+_work\Data\Scripts\* -r
+*.vm
+*.vdf
+*.bat
+
+[INCLUDE]
+
+[ENDVDF]
