@@ -2,74 +2,76 @@ var int Ninja_PickLockHelper_pickLockString_Mob;        // Mob identification
 var string Ninja_PickLockHelper_pickLockString_Last;    // Last successfully tested picklock string
 var string Ninja_PickLockHelper_pickLockString_Current; // Current picklock string
 
-var int Ninja_PickLockHelper_hTextView;
-var int Ninja_PickLockHelper_hTextViewLast;
-var int Ninja_PickLockHelper_hTextViewLastBg;
-var int Ninja_PickLockHelper_hTextViewBg;
+var int Ninja_PickLockHelper_ptrTextView;
+var int Ninja_PickLockHelper_ptrTextViewLast;
+var int Ninja_PickLockHelper_ptrTextViewLastBg;
+var int Ninja_PickLockHelper_ptrTextViewBg;
+
+var int Ninja_PickLockHelper_DisplayIsShown;
+
 var string Ninja_PickLockHelper_Font;
 
 func void Ninja_PickLockHelper_DisplayText(var string text) {
     var zCViewText textView;
     var zCViewText textViewLast;
-    
-    if(!Ninja_PickLockHelper_hTextView) {
+    const int displayIsCreated = 0;
+
+    if (!displayIsCreated) {
+        displayIsCreated = 1;
+
         const string maxText = "________________________________________";
         var int posX; posX = (PS_VMax - Print_ToVirtual(Print_GetStringWidth(maxText, Ninja_PickLockHelper_Font), PS_X)) / 2;
 
-        Ninja_PickLockHelper_hTextViewLastBg = View_Create(posX, 400, 1, 1);
-        View_ResizePxl(Ninja_PickLockHelper_hTextViewLastBg, Print_GetStringWidth(maxText, Ninja_PickLockHelper_Font), Print_GetFontHeight(Ninja_PickLockHelper_Font));
-        View_SetTexture(Ninja_PickLockHelper_hTextViewLastBg, "Black.tga");
-        View_SetAlpha(Ninja_PickLockHelper_hTextViewLastBg, 128);
+        Ninja_PickLockHelper_ptrTextViewLastBg = ViewPtr_Create(posX, 400, 1, 1);
+        ViewPtr_ResizePxl(Ninja_PickLockHelper_ptrTextViewLastBg, Print_GetStringWidth(maxText, Ninja_PickLockHelper_Font), Print_GetFontHeight(Ninja_PickLockHelper_Font));
+        ViewPtr_SetTexture(Ninja_PickLockHelper_ptrTextViewLastBg, "DEFAULT.TGA");
+        ViewPtr_SetColor(Ninja_PickLockHelper_ptrTextViewLastBg, RGBA(0, 0, 0, 255));
+        ViewPtr_SetAlpha(Ninja_PickLockHelper_ptrTextViewLastBg, 128);
 
-        Ninja_PickLockHelper_hTextViewBg = View_Create(posX, 400, 1, 1);
-        View_ResizePxl(Ninja_PickLockHelper_hTextViewBg, Print_GetStringWidth(maxText, Ninja_PickLockHelper_Font), Print_GetFontHeight(Ninja_PickLockHelper_Font));
+        Ninja_PickLockHelper_ptrTextViewBg = ViewPtr_Create(posX, 400, 1, 1);
+        ViewPtr_ResizePxl(Ninja_PickLockHelper_ptrTextViewBg, Print_GetStringWidth(maxText, Ninja_PickLockHelper_Font), Print_GetFontHeight(Ninja_PickLockHelper_Font));
 
         // Previous progress
-        Ninja_PickLockHelper_hTextViewLast = Print_CreateText(Ninja_PickLockHelper_pickLockString_Last, Ninja_PickLockHelper_Font);
-        textViewLast = Print_GetText(Ninja_PickLockHelper_hTextViewLast);
+        
+        Ninja_PickLockHelper_ptrTextViewLast = Print_CreateTextPtr(Ninja_PickLockHelper_pickLockString_Last, Ninja_PickLockHelper_Font);
+        textViewLast = _^(Ninja_PickLockHelper_ptrTextViewLast);
         textViewLast.posx = 300;
         textViewLast.color = RGBA(255, 255, 255, 128);
         textViewLast.colored = TRUE;
         textViewLast.timed = FALSE;
 
-
         // Current progress
-        Ninja_PickLockHelper_hTextView = Print_CreateText(text, Ninja_PickLockHelper_Font);
-        textView = Print_GetText(Ninja_PickLockHelper_hTextView);
-        // textView.color = RGBA(255, 32, 82, 255);
+        Ninja_PickLockHelper_ptrTextView = Print_CreateTextPtr(text, Ninja_PickLockHelper_Font);
+        textView = _^(Ninja_PickLockHelper_ptrTextView);
         textView.posx = 300;
         textView.color = RGBA(96, 255, 96, 255);
         textView.colored = TRUE;
         textView.timed = FALSE;
 
-        View_AddTextView(Ninja_PickLockHelper_hTextViewLastBg, MEM_InstToPtr(textViewLast));
-        View_AddTextView(Ninja_PickLockHelper_hTextViewBg, MEM_InstToPtr(textView));
+        ViewPtr_AddTextView(Ninja_PickLockHelper_ptrTextViewLastBg, Ninja_PickLockHelper_ptrTextViewLast);
+        ViewPtr_AddTextView(Ninja_PickLockHelper_ptrTextViewBg, Ninja_PickLockHelper_ptrTextView);
+    }
+    if(!Ninja_PickLockHelper_DisplayIsShown) {
+        Ninja_PickLockHelper_DisplayIsShown = 1;
+        textViewLast = _^(Ninja_PickLockHelper_ptrTextViewLast);
+        textViewLast.text = Ninja_PickLockHelper_pickLockString_Last;
 
-        View_Open(Ninja_PickLockHelper_hTextViewLastBg);
-        View_Open(Ninja_PickLockHelper_hTextViewBg);
-    } else {        
-        textView = Print_GetText(Ninja_PickLockHelper_hTextView);
-        textView.text = text;
+        ViewPtr_Open(Ninja_PickLockHelper_ptrTextViewLastBg);
+        ViewPtr_Open(Ninja_PickLockHelper_ptrTextViewBg);
     };
-    
-    // Print_Ext(150, 400, text, Ninja_PickLockHelper_Font, RGBA(255,32,82,255), 3000);
+    textView = _^(Ninja_PickLockHelper_ptrTextView);
+    textView.text = text;
 };
 
 func void Ninja_PickLockHelper_RemoveText() {
     Ninja_PickLockHelper_pickLockString_Current = "";
-    if(Ninja_PickLockHelper_hTextView) {
-        Print_DeleteText(Ninja_PickLockHelper_hTextView);
-        Ninja_PickLockHelper_hTextView = 0;
-
-        Print_DeleteText(Ninja_PickLockHelper_hTextViewLast);
-        Ninja_PickLockHelper_hTextViewLast = 0;
-
-        View_Delete(Ninja_PickLockHelper_hTextViewBg);
-        Ninja_PickLockHelper_hTextViewBg = 0;
-
-        View_Delete(Ninja_PickLockHelper_hTextViewLastBg);
-        Ninja_PickLockHelper_hTextViewLastBg = 0;
+    if(Ninja_PickLockHelper_ptrTextViewBg) {
+        ViewPtr_Close(Ninja_PickLockHelper_ptrTextViewBg);
     };
+    if(Ninja_PickLockHelper_ptrTextViewLastBg) {
+        ViewPtr_Close(Ninja_PickLockHelper_ptrTextViewLastBg);
+    };
+    Ninja_PickLockHelper_DisplayIsShown = 0;
 };
 
 func void Ninja_PickLockHelper_HOOK_MOBCONTAINER_PICKLOCK()
@@ -86,7 +88,7 @@ func void Ninja_PickLockHelper_HOOK_MOBCONTAINER_PICKLOCK()
     var int c;
     c = MEM_ReadInt(ESP + 8);
     
-    var string Ninja_PickLockHelper_pickLockString;
+    var string pickLockString;
     
     var int currCharCount;
     currCharCount =(mob.bitfield & oCMobLockable_bitfield_pickLockNr) >> 2;
@@ -95,19 +97,19 @@ func void Ninja_PickLockHelper_HOOK_MOBCONTAINER_PICKLOCK()
     currCharCount += 1;
     if(currCharCount > 0)
     {
-        Ninja_PickLockHelper_pickLockString = STR_Prefix(mob.pickLockStr, currCharCount);
+        pickLockString = STR_Prefix(mob.pickLockStr, currCharCount);
     };
 
     // Compare players attempt with current picklock string + 1
     if(c == 76) {
-        if(Hlp_StrCmp(ConcatStrings(Ninja_PickLockHelper_pickLockString_Current, "L"), Ninja_PickLockHelper_pickLockString))
+        if(Hlp_StrCmp(ConcatStrings(Ninja_PickLockHelper_pickLockString_Current, "L"), pickLockString))
         {
-            Ninja_PickLockHelper_pickLockString_Current = Ninja_PickLockHelper_pickLockString;
+            Ninja_PickLockHelper_pickLockString_Current = pickLockString;
         };
     } else if(c == 82) {
-        if(Hlp_StrCmp(ConcatStrings(Ninja_PickLockHelper_pickLockString_Current, "R"), Ninja_PickLockHelper_pickLockString))
+        if(Hlp_StrCmp(ConcatStrings(Ninja_PickLockHelper_pickLockString_Current, "R"), pickLockString))
         {
-            Ninja_PickLockHelper_pickLockString_Current = Ninja_PickLockHelper_pickLockString;
+            Ninja_PickLockHelper_pickLockString_Current = pickLockString;
         };
     };
 
@@ -195,8 +197,8 @@ func void Ninja_PickLockHelper_G_PickLock(var int bSuccess, var int bBrokenOpen)
     if (bSuccess && bBrokenOpen) {
         Ninja_PickLockHelper_RemoveText();
     } else if(!bSuccess) {
-        textView = Print_GetText(Ninja_PickLockHelper_hTextView);
-        textViewLast = Print_GetText(Ninja_PickLockHelper_hTextViewLast);
+        textView = _^(Ninja_PickLockHelper_ptrTextView);
+        textViewLast = _^(Ninja_PickLockHelper_ptrTextViewLast);
 
         Ninja_PickLockHelper_pickLockString_Current = "";
         textView.text = Ninja_PickLockHelper_pickLockString_Current;
