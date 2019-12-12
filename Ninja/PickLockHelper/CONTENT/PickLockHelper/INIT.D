@@ -241,5 +241,5 @@ func void Ninja_PickLockHelper_Init_Internal() {
         HookEngine(oCMobLockable__PickLock_G2, 6, "Ninja_PickLockHelper_HOOK_MOBCONTAINER_PICKLOCK");
     };
     HookDaedalusFuncS("G_PickLock", "Ninja_PickLockHelper_G_PickLock");
-    MEM_Info("PickLockHelper was initialized successfully.");
+    MEM_Info("PickLockHelper 1.2 was initialized successfully.");
 };
