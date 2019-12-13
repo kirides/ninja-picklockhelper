@@ -1,23 +1,27 @@
-var int Ninja_PickLockHelper_pickLockString_Mob;        // Mob identification
+/*
+    Code mostly from WoG Member F A W K E S
+    Converted to a Patch by Kirides
+    Many recommended modifications by WoG Member mud-freak implemented.
+*/
+
+const int Ninja_PickLockHelper_pickLockString_Mob = 0;  // Mob identification
 var string Ninja_PickLockHelper_pickLockString_Last;    // Last successfully tested picklock string
 var string Ninja_PickLockHelper_pickLockString_Current; // Current picklock string
 
-var int Ninja_PickLockHelper_ptrTextView;
-var int Ninja_PickLockHelper_ptrTextViewLast;
-var int Ninja_PickLockHelper_ptrTextViewLastBg;
-var int Ninja_PickLockHelper_ptrTextViewBg;
+const int Ninja_PickLockHelper_ptrTextView = 0;
+const int Ninja_PickLockHelper_ptrTextViewLast = 0;
+const int Ninja_PickLockHelper_ptrTextViewLastBg = 0;
+const int Ninja_PickLockHelper_ptrTextViewBg = 0;
 
-var int Ninja_PickLockHelper_DisplayIsShown;
+const int Ninja_PickLockHelper_DisplayIsShown = 0;
 
 var string Ninja_PickLockHelper_Font;
 
 func void Ninja_PickLockHelper_DisplayText(var string text) {
     var zCViewText textView;
     var zCViewText textViewLast;
-    const int displayIsCreated = 0;
 
-    if (!displayIsCreated) {
-        displayIsCreated = 1;
+    if (!Ninja_PickLockHelper_ptrTextView) {
 
         const string maxText = "________________________________________";
         var int posX; posX = (PS_VMax - Print_ToVirtual(Print_GetStringWidth(maxText, Ninja_PickLockHelper_Font), PS_X)) / 2;
@@ -74,8 +78,7 @@ func void Ninja_PickLockHelper_RemoveText() {
     Ninja_PickLockHelper_DisplayIsShown = 0;
 };
 
-func void Ninja_PickLockHelper_HOOK_MOBCONTAINER_PICKLOCK()
-{
+func void Ninja_PickLockHelper_HOOK_MOBCONTAINER_PICKLOCK() {
     var oCNPC slf;
     slf = _^(MEM_ReadInt(ESP + 4));
     
@@ -122,8 +125,7 @@ func void Ninja_PickLockHelper_HOOK_MOBCONTAINER_PICKLOCK()
 };
 
 
-func void Ninja_PickLockHelper_HOOK_MOBINTER_STARTINTERACTION()
-{
+func void Ninja_PickLockHelper_HOOK_MOBINTER_STARTINTERACTION() {
     var oCNPC slf;
     slf = _^(MEM_ReadInt(ESP + 4));
     
@@ -164,8 +166,7 @@ func void Ninja_PickLockHelper_HOOK_MOBINTER_STARTINTERACTION()
     };
 };
 
-func void Ninja_PickLockHelper_HOOK_MOBINTER_ENDINTERACTION()
-{
+func void Ninja_PickLockHelper_HOOK_MOBINTER_ENDINTERACTION() {
     var oCNPC slf;
     slf = _^(MEM_ReadInt(ESP + 4));
     
@@ -173,17 +174,6 @@ func void Ninja_PickLockHelper_HOOK_MOBINTER_ENDINTERACTION()
     {
         Ninja_PickLockHelper_RemoveText();
     };    
-};
-
-func void Ninja_PickLockHelper_HOOK_MOBINTER_STOPINTERACTION()
-{
-    var oCNPC slf;
-    slf = _^(MEM_ReadInt(ESP + 4));
-    
-    if(NPC_IsPlayer(slf) && Hlp_Is_oCMobLockable(ECX))
-    {
-        Ninja_PickLockHelper_RemoveText();
-    };
 };
 
 /// Hooked G_PickLock to reset Ninja_PickLockHelper_pickLockString_Current on success or broken lockpick
@@ -227,19 +217,25 @@ func void Ninja_PickLockHelper_Init_Internal() {
     //0x00721580 protected: virtual void __thiscall oCMobInter::StartInteraction(class oCNpc *)
     const int oCMobInter__StartInteraction_G2 = 7476608;
 
-    LeGo_MergeFlags(LeGo_Interface | LeGo_View); // https://lego.worldofplayers.de/?Interface
-    
-    HookEngine(MEMINT_SwitchG1G2(oCMobInter__StartInteraction_G1, oCMobInter__StartInteraction_G2), 6, "Ninja_PickLockHelper_HOOK_MOBINTER_STARTINTERACTION");
-    HookEngine(MEMINT_SwitchG1G2(oCMobInter__EndInteraction_G1  , oCMobInter__EndInteraction_G2  ), 6, "Ninja_PickLockHelper_HOOK_MOBINTER_ENDINTERACTION"  );
-    HookEngine(MEMINT_SwitchG1G2(oCMobInter__StopInteraction_G1 , oCMobInter__StopInteraction_G2 ), 6, "Ninja_PickLockHelper_HOOK_MOBINTER_STOPINTERACTION" );
+    // Check if function even exists before anything
+    if (MEM_FindParserSymbol("G_PickLock") != -1) {
+        LeGo_MergeFlags(LeGo_Interface | LeGo_View); // https://lego.worldofplayers.de/?Interface
+        
+        HookEngine(MEMINT_SwitchG1G2(oCMobInter__StartInteraction_G1, oCMobInter__StartInteraction_G2), 6, "Ninja_PickLockHelper_HOOK_MOBINTER_STARTINTERACTION");
+        HookEngine(MEMINT_SwitchG1G2(oCMobInter__EndInteraction_G1  , oCMobInter__EndInteraction_G2  ), 6, "Ninja_PickLockHelper_HOOK_MOBINTER_ENDINTERACTION"  );
+        HookEngine(MEMINT_SwitchG1G2(oCMobInter__StopInteraction_G1 , oCMobInter__StopInteraction_G2 ), 6, "Ninja_PickLockHelper_HOOK_MOBINTER_ENDINTERACTION"  );
 
-    if(MEMINT_SwitchG1G2(1, 0)) {
-        Ninja_PickLockHelper_Font = "FONT_OLD_10_WHITE.TGA";
-        HookEngine(oCMobLockable__PickLock_G1, 13, "Ninja_PickLockHelper_HOOK_MOBCONTAINER_PICKLOCK");
+        if(MEMINT_SwitchG1G2(1, 0)) {
+            Ninja_PickLockHelper_Font = "FONT_OLD_10_WHITE.TGA";
+            HookEngine(oCMobLockable__PickLock_G1, 13, "Ninja_PickLockHelper_HOOK_MOBCONTAINER_PICKLOCK");
+        } else {
+            Ninja_PickLockHelper_Font = TEXT_FONT_DEFAULT;
+            HookEngine(oCMobLockable__PickLock_G2, 6, "Ninja_PickLockHelper_HOOK_MOBCONTAINER_PICKLOCK");
+        };
+        HookDaedalusFuncS("G_PickLock", "Ninja_PickLockHelper_G_PickLock");
+        MEM_Info("PickLockHelper 1.3 was initialized successfully.");
     } else {
-        Ninja_PickLockHelper_Font = TEXT_FONT_DEFAULT;
-        HookEngine(oCMobLockable__PickLock_G2, 6, "Ninja_PickLockHelper_HOOK_MOBCONTAINER_PICKLOCK");
+         // Warning without stack trace
+        MEM_SendToSpy(zERR_TYPE_WARN, "PickLockHelper 1.3 failed to initialize. Symbol 'G_PickLock' not found.");
     };
-    HookDaedalusFuncS("G_PickLock", "Ninja_PickLockHelper_G_PickLock");
-    MEM_Info("PickLockHelper 1.2 was initialized successfully.");
 };
