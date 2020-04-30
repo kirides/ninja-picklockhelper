@@ -54,7 +54,7 @@ func void Ninja_PickLockHelper_DisplayText(var string text) {
 
         ViewPtr_AddTextView(Ninja_PickLockHelper_ptrTextViewLastBg, Ninja_PickLockHelper_ptrTextViewLast);
         ViewPtr_AddTextView(Ninja_PickLockHelper_ptrTextViewBg, Ninja_PickLockHelper_ptrTextView);
-    }
+    };
     if(!Ninja_PickLockHelper_DisplayIsShown) {
         Ninja_PickLockHelper_DisplayIsShown = 1;
         textViewLast = _^(Ninja_PickLockHelper_ptrTextViewLast);
@@ -136,7 +136,7 @@ func void Ninja_PickLockHelper_HOOK_MOBINTER_STARTINTERACTION() {
         
         if (!(mob.bitfield & oCMobLockable_bitfield_locked)) {
             return; // Already unlocked
-        }
+        };
 
         // Reset for new mob
         if (STR_Len(Ninja_PickLockHelper_pickLockString_Last) > 0)
@@ -229,7 +229,7 @@ func void Ninja_PickLockHelper_Init_Internal() {
             Ninja_PickLockHelper_Font = "FONT_OLD_10_WHITE.TGA";
             HookEngine(oCMobLockable__PickLock_G1, 13, "Ninja_PickLockHelper_HOOK_MOBCONTAINER_PICKLOCK");
         } else {
-            Ninja_PickLockHelper_Font = TEXT_FONT_DEFAULT;
+            Ninja_PickLockHelper_Font = "FONT_OLD_10_WHITE.TGA";
             HookEngine(oCMobLockable__PickLock_G2, 6, "Ninja_PickLockHelper_HOOK_MOBCONTAINER_PICKLOCK");
         };
         HookDaedalusFuncS("G_PickLock", "Ninja_PickLockHelper_G_PickLock");
