@@ -67,14 +67,21 @@ func void Ninja_PickLockHelper_DisplayText(var string text) {
     textView.text = text;
 };
 
+func void Ninja_PickLockHelper_CloseViewIfOpen(var int viewPtr) {
+    if(viewPtr) {
+        var zCView view; view = _^(viewPtr);
+        if (view.isOpen) {
+            ViewPtr_Close(viewPtr);
+        };
+    };
+};
+
 func void Ninja_PickLockHelper_RemoveText() {
     Ninja_PickLockHelper_pickLockString_Current = "";
-    if(Ninja_PickLockHelper_ptrTextViewBg) {
-        ViewPtr_Close(Ninja_PickLockHelper_ptrTextViewBg);
-    };
-    if(Ninja_PickLockHelper_ptrTextViewLastBg) {
-        ViewPtr_Close(Ninja_PickLockHelper_ptrTextViewLastBg);
-    };
+
+    Ninja_PickLockHelper_CloseViewIfOpen(Ninja_PickLockHelper_ptrTextViewBg);
+    Ninja_PickLockHelper_CloseViewIfOpen(Ninja_PickLockHelper_ptrTextViewLastBg);
+
     Ninja_PickLockHelper_DisplayIsShown = 0;
 };
 
@@ -233,9 +240,9 @@ func void Ninja_PickLockHelper_Init_Internal() {
             HookEngine(oCMobLockable__PickLock_G2, 6, "Ninja_PickLockHelper_HOOK_MOBCONTAINER_PICKLOCK");
         };
         HookDaedalusFuncS("G_PickLock", "Ninja_PickLockHelper_G_PickLock");
-        MEM_Info("PickLockHelper 1.3 was initialized successfully.");
+        MEM_Info("PickLockHelper 1.4 was initialized successfully.");
     } else {
          // Warning without stack trace
-        MEM_SendToSpy(zERR_TYPE_WARN, "PickLockHelper 1.3 failed to initialize. Symbol 'G_PickLock' not found.");
+        MEM_SendToSpy(zERR_TYPE_WARN, "PickLockHelper 1.4 failed to initialize. Symbol 'G_PickLock' not found.");
     };
 };
