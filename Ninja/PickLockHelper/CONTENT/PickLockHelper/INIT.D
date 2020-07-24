@@ -232,11 +232,10 @@ func void Ninja_PickLockHelper_Init_Internal() {
         HookEngine(MEMINT_SwitchG1G2(oCMobInter__EndInteraction_G1  , oCMobInter__EndInteraction_G2  ), 6, "Ninja_PickLockHelper_HOOK_MOBINTER_ENDINTERACTION"  );
         HookEngine(MEMINT_SwitchG1G2(oCMobInter__StopInteraction_G1 , oCMobInter__StopInteraction_G2 ), 6, "Ninja_PickLockHelper_HOOK_MOBINTER_ENDINTERACTION"  );
 
+		Ninja_PickLockHelper_Font = "Ninja_PickLockHelper_Font_DE.tga";
         if(MEMINT_SwitchG1G2(1, 0)) {
-            Ninja_PickLockHelper_Font = "FONT_OLD_10_WHITE.TGA";
             HookEngine(oCMobLockable__PickLock_G1, 13, "Ninja_PickLockHelper_HOOK_MOBCONTAINER_PICKLOCK");
         } else {
-            Ninja_PickLockHelper_Font = "FONT_OLD_10_WHITE.TGA";
             HookEngine(oCMobLockable__PickLock_G2, 6, "Ninja_PickLockHelper_HOOK_MOBCONTAINER_PICKLOCK");
         };
         HookDaedalusFuncS("G_PickLock", "Ninja_PickLockHelper_G_PickLock");
