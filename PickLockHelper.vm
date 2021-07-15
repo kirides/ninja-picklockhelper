@@ -1,17 +1,12 @@
 [BEGINVDF]
-Comment=Nie wieder Links Rechts Rechts ... (v1.5.0)
+Comment=Nie wieder Links Rechts Rechts ... (v1.6.0)
 BaseDir=.\
 VDFName=.\PickLockHelper.vdf
-
 [FILES]
-; Resources (list the specific files from _work here)
-; _work\* -r
-
-; Script files
 Ninja\PickLockHelper\* -r
 _Work\* -r
-
-
+[EXCLUDE]
+*.tga -r
+*_DEV.src -r
 [INCLUDE]
-
 [ENDVDF]

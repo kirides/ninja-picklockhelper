@@ -15,7 +15,7 @@ const int Ninja_PickLockHelper_ptrTextViewBg = 0;
 
 const int Ninja_PickLockHelper_DisplayIsShown = 0;
 
-var string Ninja_PickLockHelper_Font;
+const string Ninja_PickLockHelper_Font = "PICKLOCKHELPER_FONT_SYMBOLS.tga";
 
 func void Ninja_PickLockHelper_DisplayText(var string text) {
     var zCViewText textView;
@@ -111,13 +111,15 @@ func void Ninja_PickLockHelper_HOOK_MOBCONTAINER_PICKLOCK() {
     };
 
     // Compare players attempt with current picklock string + 1
+    // "l" = ?
+    // "r" = ?
     if(c == 76) {
-        if(Hlp_StrCmp(ConcatStrings(Ninja_PickLockHelper_pickLockString_Current, "L"), pickLockString))
+        if(Hlp_StrCmp(ConcatStrings(Ninja_PickLockHelper_pickLockString_Current, "l"), pickLockString))
         {
             Ninja_PickLockHelper_pickLockString_Current = pickLockString;
         };
     } else if(c == 82) {
-        if(Hlp_StrCmp(ConcatStrings(Ninja_PickLockHelper_pickLockString_Current, "R"), pickLockString))
+        if(Hlp_StrCmp(ConcatStrings(Ninja_PickLockHelper_pickLockString_Current, "r"), pickLockString))
         {
             Ninja_PickLockHelper_pickLockString_Current = pickLockString;
         };
@@ -143,6 +145,9 @@ func void Ninja_PickLockHelper_HOOK_MOBINTER_STARTINTERACTION() {
         
         if (!(mob.bitfield & oCMobLockable_bitfield_locked)) {
             return; // Already unlocked
+        };
+        if ((mob.bitfield & oCMobLockable_bitfield_autoOpen)) {
+            return; // Does not need a key
         };
 
         // Reset for new mob
@@ -228,20 +233,21 @@ func void Ninja_PickLockHelper_Init_Internal() {
     if (MEM_FindParserSymbol("G_PickLock") != -1) {
         LeGo_MergeFlags(LeGo_Interface | LeGo_View); // https://lego.worldofplayers.de/?Interface
         
+        Ninja_PickLockHelper_Font = "PICKLOCKHELPER_FONT_SYMBOLS.tga";
+
         HookEngine(MEMINT_SwitchG1G2(oCMobInter__StartInteraction_G1, oCMobInter__StartInteraction_G2), 6, "Ninja_PickLockHelper_HOOK_MOBINTER_STARTINTERACTION");
         HookEngine(MEMINT_SwitchG1G2(oCMobInter__EndInteraction_G1  , oCMobInter__EndInteraction_G2  ), 6, "Ninja_PickLockHelper_HOOK_MOBINTER_ENDINTERACTION"  );
         HookEngine(MEMINT_SwitchG1G2(oCMobInter__StopInteraction_G1 , oCMobInter__StopInteraction_G2 ), 6, "Ninja_PickLockHelper_HOOK_MOBINTER_ENDINTERACTION"  );
 
-		Ninja_PickLockHelper_Font = "Ninja_PickLockHelper_Font_DE.tga";
         if(MEMINT_SwitchG1G2(1, 0)) {
             HookEngine(oCMobLockable__PickLock_G1, 13, "Ninja_PickLockHelper_HOOK_MOBCONTAINER_PICKLOCK");
         } else {
             HookEngine(oCMobLockable__PickLock_G2, 6, "Ninja_PickLockHelper_HOOK_MOBCONTAINER_PICKLOCK");
         };
         HookDaedalusFuncS("G_PickLock", "Ninja_PickLockHelper_G_PickLock");
-        MEM_Info("PickLockHelper 1.4 was initialized successfully.");
+        MEM_Info("PickLockHelper 1.6 was initialized successfully.");
     } else {
          // Warning without stack trace
-        MEM_SendToSpy(zERR_TYPE_WARN, "PickLockHelper 1.4 failed to initialize. Symbol 'G_PickLock' not found.");
+        MEM_SendToSpy(zERR_TYPE_WARN, "PickLockHelper 1.6 failed to initialize. Symbol 'G_PickLock' not found.");
     };
 };
