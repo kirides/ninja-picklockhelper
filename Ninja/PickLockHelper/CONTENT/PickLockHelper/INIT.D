@@ -16,6 +16,20 @@ const int Ninja_PickLockHelper_ptrTextViewBg = 0;
 const int Ninja_PickLockHelper_DisplayIsShown = 0;
 
 const string Ninja_PickLockHelper_Font = "PICKLOCKHELPER_FONT_SYMBOLS.tga";
+const string Ninja_PickLockHelper_L = "L";
+const string Ninja_PickLockHelper_R = "R";
+
+func string Ninja_PickLockHelper_Format(var string text) {
+    text = PickLockHelper_STR_ReplaceAll(text, "L", ".");
+    text = PickLockHelper_STR_ReplaceAll(text, "l", ".");
+    text = PickLockHelper_STR_ReplaceAll(text, "R", ",");
+    text = PickLockHelper_STR_ReplaceAll(text, "r", ",");
+
+    text = PickLockHelper_STR_ReplaceAll(text, ".", ConcatStrings(Ninja_PickLockHelper_L, "      ")); // ALT+0160 <- Besonderes "nichts"
+    text = PickLockHelper_STR_ReplaceAll(text, ",", ConcatStrings(Ninja_PickLockHelper_R, "      "));
+
+    return text;
+};
 
 func void Ninja_PickLockHelper_DisplayText(var string text) {
     var zCViewText textView;
@@ -58,13 +72,13 @@ func void Ninja_PickLockHelper_DisplayText(var string text) {
     if(!Ninja_PickLockHelper_DisplayIsShown) {
         Ninja_PickLockHelper_DisplayIsShown = 1;
         textViewLast = _^(Ninja_PickLockHelper_ptrTextViewLast);
-        textViewLast.text = Ninja_PickLockHelper_pickLockString_Last;
+        textViewLast.text = Ninja_PickLockHelper_Format(Ninja_PickLockHelper_pickLockString_Last);
 
         ViewPtr_Open(Ninja_PickLockHelper_ptrTextViewLastBg);
         ViewPtr_Open(Ninja_PickLockHelper_ptrTextViewBg);
     };
     textView = _^(Ninja_PickLockHelper_ptrTextView);
-    textView.text = text;
+    textView.text = Ninja_PickLockHelper_Format(text);
 };
 
 func void Ninja_PickLockHelper_CloseViewIfOpen(var int viewPtr) {
@@ -114,12 +128,12 @@ func void Ninja_PickLockHelper_HOOK_MOBCONTAINER_PICKLOCK() {
     // "l" = ?
     // "r" = ?
     if(c == 76) {
-        if(Hlp_StrCmp(ConcatStrings(Ninja_PickLockHelper_pickLockString_Current, "l"), pickLockString))
+        if(Hlp_StrCmp(ConcatStrings(Ninja_PickLockHelper_pickLockString_Current, "L"), pickLockString))
         {
             Ninja_PickLockHelper_pickLockString_Current = pickLockString;
         };
     } else if(c == 82) {
-        if(Hlp_StrCmp(ConcatStrings(Ninja_PickLockHelper_pickLockString_Current, "r"), pickLockString))
+        if(Hlp_StrCmp(ConcatStrings(Ninja_PickLockHelper_pickLockString_Current, "R"), pickLockString))
         {
             Ninja_PickLockHelper_pickLockString_Current = pickLockString;
         };
@@ -203,9 +217,46 @@ func void Ninja_PickLockHelper_G_PickLock(var int bSuccess, var int bBrokenOpen)
         textViewLast = _^(Ninja_PickLockHelper_ptrTextViewLast);
 
         Ninja_PickLockHelper_pickLockString_Current = "";
-        textView.text = Ninja_PickLockHelper_pickLockString_Current;
-        textViewLast.text = Ninja_PickLockHelper_pickLockString_Last;
+        textView.text = Ninja_PickLockHelper_Format(Ninja_PickLockHelper_pickLockString_Current);
+        textViewLast.text = Ninja_PickLockHelper_Format(Ninja_PickLockHelper_pickLockString_Last);
     };
+};
+
+func string PickLockHelper_GetOpt(var string optName, var string defaultVal) {
+	const string section = "PICKLOCKHELPER";
+	var string concatText; concatText = "";
+	var string optValue;
+
+	if (!MEM_GothOptExists(section, optName)) {
+		MEM_SetGothOpt(section, optName, defaultVal);
+		return defaultVal;
+	};
+	optValue = MEM_GetGothOpt(section, optName);
+	if (Hlp_StrCmp("", optValue)) {
+		MEM_SetGothOpt(section, optName, defaultVal);
+		optValue = defaultVal; 
+	};
+	
+	concatText = ConcatStrings(concatText, "    ");
+	concatText = ConcatStrings(concatText, optName);
+	concatText = ConcatStrings(concatText, ": ");
+	concatText = ConcatStrings(concatText, optValue);
+	MEM_Info(concatText);
+
+	return optValue;
+};
+func string PickLockHelper_SetOpt(var string optName, var string optValue) {
+	const string INI_SECTION = "PICKLOCKHELPER";
+	var string concatText; concatText = "";
+	MEM_SetGothOpt(INI_SECTION, optName, optValue);
+	
+	concatText = ConcatStrings(concatText, "    SET: ");
+	concatText = ConcatStrings(concatText, optName);
+	concatText = ConcatStrings(concatText, ": ");
+	concatText = ConcatStrings(concatText, optValue);
+	MEM_Info(concatText);
+
+	return optValue;
 };
 
 func void Ninja_PickLockHelper_Init_Internal() {
@@ -232,8 +283,17 @@ func void Ninja_PickLockHelper_Init_Internal() {
     // Check if function even exists before anything
     if (MEM_FindParserSymbol("G_PickLock") != -1) {
         LeGo_MergeFlags(LeGo_Interface | LeGo_View); // https://lego.worldofplayers.de/?Interface
-        
-        Ninja_PickLockHelper_Font = "PICKLOCKHELPER_FONT_SYMBOLS.tga";
+
+        const int useArrows = 0; useArrows = STR_ToInt(PickLockHelper_GetOpt("UseArrows", "1"));
+        Ninja_PickLockHelper_L = PickLockHelper_GetOpt("Left", "L");
+        Ninja_PickLockHelper_R = PickLockHelper_GetOpt("Right", "R");
+        if (useArrows) {
+            Ninja_PickLockHelper_L = "L";
+            Ninja_PickLockHelper_R = "R";
+            Ninja_PickLockHelper_Font = "PICKLOCKHELPER_FONT_SYMBOLS.tga";
+        } else {
+            Ninja_PickLockHelper_Font = "Font_old_10_white.tga";
+        };
 
         HookEngine(MEMINT_SwitchG1G2(oCMobInter__StartInteraction_G1, oCMobInter__StartInteraction_G2), 6, "Ninja_PickLockHelper_HOOK_MOBINTER_STARTINTERACTION");
         HookEngine(MEMINT_SwitchG1G2(oCMobInter__EndInteraction_G1  , oCMobInter__EndInteraction_G2  ), 6, "Ninja_PickLockHelper_HOOK_MOBINTER_ENDINTERACTION"  );
@@ -245,9 +305,9 @@ func void Ninja_PickLockHelper_Init_Internal() {
             HookEngine(oCMobLockable__PickLock_G2, 6, "Ninja_PickLockHelper_HOOK_MOBCONTAINER_PICKLOCK");
         };
         HookDaedalusFuncS("G_PickLock", "Ninja_PickLockHelper_G_PickLock");
-        MEM_Info("PickLockHelper 1.6 was initialized successfully.");
+        MEM_Info("PickLockHelper 1.6.1 was initialized successfully.");
     } else {
          // Warning without stack trace
-        MEM_SendToSpy(zERR_TYPE_WARN, "PickLockHelper 1.6 failed to initialize. Symbol 'G_PickLock' not found.");
+        MEM_SendToSpy(zERR_TYPE_WARN, "PickLockHelper 1.6.1 failed to initialize. Symbol 'G_PickLock' not found.");
     };
 };
